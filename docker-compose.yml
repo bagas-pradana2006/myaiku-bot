@@ -1,0 +1,23 @@
+services:
+
+  myaiku-bot:
+
+    build: .
+
+    container_name: myaiku-bot
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    volumes:
+      - ./logs:/app/logs
+
+    networks:
+      - homeserver-net
+
+networks:
+
+  homeserver-net:
+    external: true
