@@ -1,11 +1,15 @@
 from database.init_db import init_database
+from utils.logger import logger
 
 
 def startup():
-    """Inisialisasi semua komponen aplikasi."""
+    """Initialize all application components."""
 
-    print("Initializing database...")
+    logger.info("Initializing database...")
 
-    init_database()
-
-    print("Database ready.")
+    try:
+        init_database()
+        logger.info("Database ready.")
+    except Exception:
+        logger.exception("Database initialization failed.")
+        raise

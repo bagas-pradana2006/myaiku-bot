@@ -11,6 +11,9 @@ services:
     env_file:
       - .env
 
+    environment:
+      TZ: Asia/Jakarta
+
     volumes:
       - ./logs:/app/logs
 
