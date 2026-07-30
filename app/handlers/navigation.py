@@ -7,12 +7,16 @@ Menangani seluruh navigasi menu MyAiku.
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from handlers.finance_list import finance_list
+from handlers.deadline import deadline_start
 from handlers.menu import back_to_main_menu
 from handlers.productivity import productivity_menu
+from handlers.reminder import reminder_start
 from handlers.todo import todo_start
 from keyboards.main_menu import get_main_menu
 from services.todo_service import TodoService
 from services.user_service import UserService
+
 
 todo_service = TodoService()
 user_service = UserService()
@@ -81,6 +85,16 @@ async def navigation(
 
     if text == "📝 Todo":
         return await todo_start(update, context)
+
+    if text == "⏰ Reminder":
+        return await reminder_start(update, context)
+
+    if text == "📅 Deadline":
+        return await deadline_start(update, context)
+        
+    # --- Tambahkan routing ke Finance di sini ---
+    if "Finance" in text or "Keuangan" in text:
+        return await finance_list(update, context)
 
     if text == "⬅️ Kembali":
         return await back_to_main_menu(update, context)

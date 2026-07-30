@@ -6,7 +6,13 @@ Menyimpan informasi pengguna Telegram yang menggunakan MyAiku.
 
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Boolean, DateTime, Integer, String
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    DateTime,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.base import Base
@@ -89,6 +95,12 @@ class User(Base):
 
     reminders = relationship(
         "Reminder",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    deadlines = relationship(
+        "Deadline",
         back_populates="user",
         cascade="all, delete-orphan",
     )

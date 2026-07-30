@@ -14,16 +14,30 @@ from telegram.ext import (
 )
 
 from config.settings import BOT_TOKEN
+
+from handlers.deadline import deadline_conversation
+from handlers.deadline_callback import deadline_callback
+from handlers.deadline_list import deadline_list
 from handlers.navigation import navigation
+
 from handlers.reminder import reminder_conversation
 from handlers.reminder_callback import reminder_callback
 from handlers.reminder_list import reminder_list
+
 from handlers.start import help_command, start
 from handlers.status import status
+
 from handlers.todo import todo_conversation
 from handlers.todo_callback import todo_callback
 from handlers.todo_list import todo_list
+
+# --- Import Finance Handler Baru ---
+from handlers.finance_list import finance_list
+from handlers.finance import finance_conversation
+from handlers.finance_callback import finance_callback  
+from scheduler.deadline_scheduler import deadline_scheduler
 from scheduler.reminder_scheduler import reminder_scheduler
+
 from startup import startup
 from utils.error_handler import error_handler
 from utils.logger import logger
@@ -59,6 +73,10 @@ def build_application() -> Application:
 
     app.add_handler(CommandHandler("todos", todo_list))
     app.add_handler(CommandHandler("reminders", reminder_list))
+    app.add_handler(CommandHandler("deadlines", deadline_list))
+    
+    # --- Tambahkan Command Finance ---
+    app.add_handler(CommandHandler("finance", finance_list))
 
     # ======================================================
     # Conversation Handlers
@@ -66,6 +84,10 @@ def build_application() -> Application:
 
     app.add_handler(todo_conversation)
     app.add_handler(reminder_conversation)
+    app.add_handler(deadline_conversation)
+    
+    # --- Tambahkan Conversation Finance ---
+    app.add_handler(finance_conversation)
 
     # ======================================================
     # Callback Query Handlers
@@ -90,6 +112,28 @@ def build_application() -> Application:
                 r"reminder_delete_confirm_|"
                 r"reminder_delete_cancel$)"
             ),
+        )
+    )
+
+    app.add_handler(
+        CallbackQueryHandler(
+            deadline_callback,
+            pattern=(
+                r"^(deadline_done_|"
+                r"deadline_undo_|"
+                r"deadline_edit_|"
+                r"deadline_delete_|"
+                r"deadline_delete_confirm_|"
+                r"deadline_delete_cancel$)"
+            ),
+        )
+    )
+
+    # --- Tambahkan Callback Finance ---
+    app.add_handler(
+        CallbackQueryHandler(
+            finance_callback,
+            pattern=r"^(finance_history|finance_summary|finance_del_.*|finance_delconfirm_.*)$",
         )
     )
 
@@ -134,6 +178,16 @@ def main():
         first=5,
         name="reminder_scheduler",
     )
+
+    application.job_queue.run_repeating(
+        deadline_scheduler,
+        interval=30,
+        first=10,
+        name="deadline_scheduler",
+    )
+
+    logger.info("Reminder scheduler registered.")
+    logger.info("Deadline scheduler registered.")
 
     logger.info("🚀 MyAiku Bot started successfully.")
 
